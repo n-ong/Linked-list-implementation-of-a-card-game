@@ -1,0 +1,130 @@
+//Nick Ong
+#include <iostream>
+#include <fstream>
+#include <string>
+#include "cards.h"
+
+using namespace std;
+
+int main(int argv, char** argc){
+  if(argv != 3){
+    cout << "Please provide 2 file names" << endl;
+    return 1;
+  }
+  
+  ifstream cardFile1 (argc[1]);
+  ifstream cardFile2 (argc[2]);
+  string line;
+
+  if (cardFile1.fail()){
+    cout << "Could not open file " << argc[1];
+    return 1;
+  }
+
+  if (cardFile2.fail()){
+    cout << "Could not open file " << argc[2];
+    return 1;
+  }
+
+  // Create two objects of the class you defined 
+  // to contain two sets of cards in two input files
+  CardList alice;
+  CardList bob;
+  // Read each file and store cards
+  while (getline (cardFile1, line) && (line.length() > 0)){
+    alice.append(line);
+  }
+  cardFile1.close();
+
+  while (getline (cardFile2, line) && (line.length() > 0)){
+    bob.append(line);
+  }
+  cardFile2.close();
+
+
+  bool game = true;
+  bool aliceTurn = true;
+  bool bobTurn = false;
+
+  Card* aliceIter = alice.getFirst();
+  Card* bobIter = bob.getFirst();
+  // Start the game
+
+  while (game)
+    {
+      while (aliceTurn)
+	{
+	  while (aliceIter)
+	    {
+	      if (bob.contains(*aliceIter))
+		{
+		  cout<<"Alice picked matching card "<<*aliceIter;
+		  Card* temp = aliceIter;
+		  aliceIter = aliceIter->next;
+		  bob.remove(*temp);
+		  alice.remove(*temp);
+
+		  aliceTurn = false;
+		  bobTurn = true;
+		  
+		  break;
+		}
+	      aliceIter = aliceIter->next;
+	    }
+	  if (aliceIter == NULL)
+	    {
+	      aliceTurn = false;
+	    }
+	}
+
+      while (bobTurn)
+	{
+	  while (bobIter)
+	    {
+	      if (alice.contains(*bobIter) && aliceIter != NULL)
+		{
+		  cout<<"Bob picked matching card "<<*bobIter;
+		  Card* temp = bobIter;
+		  bobIter = bobIter->next;
+		  alice.remove(*temp);
+		  bob.remove(*temp);
+		  
+		  bobTurn = false;
+		  aliceTurn = true;
+		  
+		  break;
+		}
+	      bobIter = bobIter->next;
+	    }
+	  if (bobIter == NULL)
+	    {
+	      bobTurn = false;
+	    }
+	}
+      
+      if (!aliceTurn && !bobTurn)
+	{
+	  game = false;
+	}
+    }
+
+  //printing Alice's remaining cards
+  cout<<"\nAlice's cards: "<<endl;
+  Card* iter = alice.getFirst();
+  while (iter)
+   {
+     cout<<*iter<<endl;
+     iter = iter->next;
+   }
+  
+  //printing Bob's remaining cards
+  cout<<"\nBob's cards: "<<endl;
+  iter = bob.getFirst();
+  while(iter)
+    {
+      cout<<*iter<<endl;
+      iter = iter->next;
+    }
+  
+  return 0;
+}

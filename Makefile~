@@ -1,0 +1,14 @@
+game: cards.o main.o
+	g++ cards.o main.o -o game
+
+main.o: main.cpp cards.h
+	g++ main.cpp -c
+
+cards.o: cards.cpp cards.h
+	g++ cards.cpp -c
+
+testcards.o: testcards.cpp cards.h testcards.h
+	g++ testcards.cpp -c
+
+test: testcards.o
+	g++ testcards.o -o test
